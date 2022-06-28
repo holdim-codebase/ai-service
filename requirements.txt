@@ -1,0 +1,5 @@
+uvicorn==0.18.2
+fastapi
+openai==0.13.0
+Jinja2==3.0.1
+simplejson==3.16.0
