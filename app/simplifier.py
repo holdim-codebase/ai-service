@@ -12,10 +12,11 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 class Simplifier():
 
-    def load_model_config(self):
-        return SimplifierModel(json.load(open('modules/configs/ETS.json')))
+    def load_model_config(self, mode):
+        return SimplifierModel(json.load(open(f'modules/configs/{mode}.json')))
 
-    def response(self, text, temperature_response, top_p, max_tokens):
-        seq_model = self.load_model_config()
+    def response(self, text, temperature_response, top_p, max_tokens, mode):
+        seq_model = self.load_model_config(mode)
         answer = seq_model.response(text, temperature_response, top_p, max_tokens)
+        print(answer)
         return answer

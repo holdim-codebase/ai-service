@@ -21,8 +21,9 @@ def chatbot_response(
         temperature_response: float = Form(...),
         top_p: float = Form(...),
         max_tokens: int = Form(...),
+        mode: str = Form(...)
 ):
-    response = simplifier.response(user_message, temperature_response, top_p, max_tokens)
+    response = simplifier.response(user_message, temperature_response, top_p, max_tokens, mode)
     return json.dumps(response)
 
 
