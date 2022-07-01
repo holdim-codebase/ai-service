@@ -57,6 +57,7 @@ This preliminary Snapshot vote serves to obtain approval from the community on t
     $(document).ready(function() {
         $("form").on("submit", function(event) {
             var rawText = $("#text").val();
+            rawText = rawText.replace(/(?:\r\n|\r|\n)/g, '<br>');
             if (rawText == ""){
                 rawText = "/empty prompt/"
             }
@@ -64,11 +65,8 @@ This preliminary Snapshot vote serves to obtain approval from the community on t
             var top_p = $("#top_p").val();
             var mode = $("#mode").val();
             var temperature_response = $("#temperature_response").val();
-
-            var keyText = $("#key").val() + '.txt';
-            var userHtml = '<p class="userText"><span>' + rawText + "</span></p>";
-
-            //$("#text").val("");
+            var keyText = $("#key").val();
+            var userHtml = '<p class="userText">' + '<b>Text:</b><br>' + rawText + "</p>";
             $("#chatbox").append(userHtml);
             document.getElementById("userInput").scrollIntoView({
                 block: "start",
@@ -86,9 +84,10 @@ This preliminary Snapshot vote serves to obtain approval from the community on t
                 type: "POST",
                 url: "/post",
             }).done(function(data) {
-                const obj = JSON.parse(data);
+                var obj = JSON.parse(data);
+                obj = obj.replace(/(?:\r\n|\r|\n)/g, '<br>');
                 console.log(obj)
-                var botHtml = '<p class="botText"><span>' + "<b>Result:</b>\n" + obj + "</span></p>";
+                var botHtml = '<p class="botText">' + '<b>Result:</b><br>' + obj + '</p>' + '<hr>';
 
                 $("#chatbox").append($.parseHTML(botHtml));
 

@@ -3,3 +3,4 @@ fastapi
 openai==0.13.0
 Jinja2==3.0.1
 simplejson==3.16.0
+python-multipart

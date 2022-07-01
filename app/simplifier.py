@@ -7,7 +7,7 @@ sys.path.append("../modules/sequence_generator.py")
 
 from modules.sequence_generator import SimplifierModel
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+openai.api_key = "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"
 
 
 class Simplifier():
