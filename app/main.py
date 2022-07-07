@@ -21,9 +21,11 @@ def chatbot_response(
         temperature_response: float = Form(...),
         top_p: float = Form(...),
         max_tokens: int = Form(...),
-        mode: str = Form(...)
+        mode: str = Form(...),
+        cut_off: bool = Form(...),
+        regen: int = Form(...)
 ):
-    response = simplifier.response(user_message, temperature_response, top_p, max_tokens, mode)
+    response = simplifier.response(user_message, temperature_response, top_p, max_tokens, mode, regen, cut_off)
     return json.dumps(response)
 
 
@@ -37,4 +39,4 @@ if __name__ == "__main__":
     # http://127.0.0.1:8000/docs
     # http://127.0.0.1:8000/redoc
 
-    uvicorn.run("main:app", host="0.0.0.0", port=80, log_level="info")
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info")

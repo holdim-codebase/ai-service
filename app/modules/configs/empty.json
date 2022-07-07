@@ -1,0 +1,10 @@
+{
+  "model": "text-davinci-002",
+  "temperature": 0.7,
+  "max_tokens": 70,
+  "frequency_penalty": 1,
+  "presence_penalty": 1,
+  "stop": ["\n\n"],
+  "completion_setup": "",
+  "task": ""
+}

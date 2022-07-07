@@ -32,13 +32,19 @@
                         <br>
                         <label for="top_p">Mode:</label>
                         <select id="mode">
+                          <option value="nas">nas</option>
                           <option value="ETS">ETS</option>
                           <option value="TLDR">TLDR</option>
                           <option value="terms">terms</option>
+                          <option value="empty">empty</option>
                         </select>
+                        <label for="cut_off">Cut off:</label>
+                        <input id="cut_off" type="checkbox" name="cut_off" placeholder="Cut off" class="form-control" checked>
+                        <label for="regen">Regen:</label>
+                        <input id="regen" type="number" name="regen" placeholder="Regen" class="form-control" size="1" value="0" step="1" style="width: 2em">
                         <br>
                         <label for="max_tokens">Tokens:</label>
-                        <input id="max_tokens" type="number" name="max_tokens" placeholder="Max tokens" class="form-control" size="1" value="125" step="1">
+                        <input id="max_tokens" type="number" name="max_tokens" placeholder="Max tokens" class="form-control" size="0.5" value="125" step="1">
                         <button type="submit" id="send" class="btn btn-warning">Send</button>
                         <br>
                         <textarea id="text" name="user_message" placeholder="Prompt" class="form-control" rows="30" cols="40">As described on this post, Sigma Prime has prepared a proposal to provide continuous security assessment services to the Aave ecosystem, provisioning up to 280 person-days of effort (240 + 40 optional) allocated throughout 7 testing windows, and spread over a period of 12 months.
@@ -56,6 +62,11 @@ This preliminary Snapshot vote serves to obtain approval from the community on t
 <script>
     $(document).ready(function() {
         $("form").on("submit", function(event) {
+            var cut_off = $("#cut_off")[0].checked;
+            $('#checkbox').prop('checked')
+            console.log(cut_off);
+            var regen = $("#regen").val();
+
             var rawText = $("#text").val();
             rawText = rawText.replace(/(?:\r\n|\r|\n)/g, '<br>');
             if (rawText == ""){
@@ -80,6 +91,8 @@ This preliminary Snapshot vote serves to obtain approval from the community on t
                     temperature_response: temperature_response,
                     user_message: rawText,
                     key: keyText,
+                    cut_off: cut_off,
+                    regen: regen
                 },
                 type: "POST",
                 url: "/post",
