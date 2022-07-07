@@ -68,7 +68,7 @@ This preliminary Snapshot vote serves to obtain approval from the community on t
             var regen = $("#regen").val();
 
             var rawText = $("#text").val();
-            rawText = rawText.replace(/(?:\r\n|\r|\n)/g, '<br>');
+            var brText = rawText.replace(/(?:\r\n|\r|\n)/g, '<br>');
             if (rawText == ""){
                 rawText = "/empty prompt/"
             }
@@ -77,7 +77,7 @@ This preliminary Snapshot vote serves to obtain approval from the community on t
             var mode = $("#mode").val();
             var temperature_response = $("#temperature_response").val();
             var keyText = $("#key").val();
-            var userHtml = '<p class="userText">' + '<b>Text:</b><br>' + rawText + "</p>";
+            var userHtml = '<p class="userText">' + '<b>Text:</b><br>' + brText + "</p>";
             $("#chatbox").append(userHtml);
             document.getElementById("userInput").scrollIntoView({
                 block: "start",
