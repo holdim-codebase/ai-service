@@ -1,7 +1,4 @@
-uvicorn==0.18.2
-fastapi
-openai==0.13.0
-Jinja2==3.0.1
-simplejson==3.16.0
-python-multipart
-transformers
+uvicorn>=0.18.2
+fastapi>=0.78.0
+python-dotenv>=0.20.0
+openai>=0.13.0
