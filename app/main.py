@@ -15,23 +15,10 @@ app = FastAPI(
 simplifier = Simplifier()
 
 
-@app.post("/post")
-def chatbot_response(
-        user_message: str = Form(...),
-        temperature_response: float = Form(...),
-        top_p: float = Form(...),
-        max_tokens: int = Form(...),
-        mode: str = Form(...),
-        cut_off: bool = Form(...),
-        regen: int = Form(...)
-):
-    response = simplifier.response(user_message, temperature_response, top_p, max_tokens, mode, regen, cut_off)
+@app.post("/")
+def index():
+    response = simplifier.response('', temperature_response, top_p, max_tokens, mode, regen, cut_off)
     return json.dumps(response)
-
-
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", context={'request': request})
 
 
 if __name__ == "__main__":
@@ -39,4 +26,4 @@ if __name__ == "__main__":
     # http://127.0.0.1:8000/docs
     # http://127.0.0.1:8000/redoc
 
-    uvicorn.run("main:app", host="0.0.0.0", port=80, log_level="info")
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, log_level="info")
