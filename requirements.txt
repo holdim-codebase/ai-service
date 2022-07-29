@@ -2,3 +2,4 @@ uvicorn>=0.18.2
 fastapi>=0.78.0
 python-dotenv>=0.20.0
 openai>=0.13.0
+google-cloud-pubsub==2.13.4
