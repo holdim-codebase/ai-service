@@ -34,7 +34,7 @@ async def chatbot_response(info: Request):
     user_message = json.loads(message)
     juniorDescription = simplifier.generate_answer(user_message['seniorDescription'])
     id = user_message['id']
-    json_final = json.dumps({id: id, juniorDescription: juniorDescription}).encode("utf-8")
+    json_final = json.dumps({'id': id, 'juniorDescription': juniorDescription}).encode("utf-8")
     future = publisher.publish(topic_path, json_final)
     print(f'published message id {future.result()}')
     return json.dumps({})
