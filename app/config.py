@@ -3,6 +3,28 @@ import os
 
 load_dotenv()
 
+
+def set_conf(completion_setup, task):
+    return {'COMPLETION_SETUP': completion_setup, 'TASK': task}
+
+
+CONTEXT_PARAMS = {'default':
+                      set_conf('My second grader asked me what this passage means:\n',
+                               'I understood the text and explained what the proposal is about:\n'),
+                  'ETS':
+                      set_conf('My second grader asked me what this passage means:\n',
+                               'I rephrased it for him, in plain language a second grader can understand:\n'),
+                  'TLDR':
+                      set_conf('',
+                               'TL;DR:\n'),
+                  'terms':
+                      set_conf('',
+                               'Explain all the crypto terms from proposal above a second grader can understand, each from a new line:\n'),
+                  'empty':
+                      set_conf('',
+                               '')
+                  }
+CONTEXT_PARAMS_NAMES = list(CONTEXT_PARAMS.keys())
 SIMPLIFIER_PARMS = {"REGEN": 0,
                     "CUT_OFF": True,
                     "TEMPERATURE": float(os.getenv('CONFIG_TEMPERATURE', 0.87)),

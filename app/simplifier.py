@@ -1,7 +1,7 @@
 import openai
 import sys
 import re
-from config import SIMPLIFIER_PARMS
+from config import SIMPLIFIER_PARMS, CONTEXT_PARAMS
 from openai import Completion
 
 sys.path.append("./config.py")
@@ -10,21 +10,24 @@ openai.api_key = SIMPLIFIER_PARMS['OPENAI_API_KEY']
 
 class Simplifier():
     def __init__(self):
-        self.config = SIMPLIFIER_PARMS
+        self.simplifier_params = SIMPLIFIER_PARMS
+        self.context_params = CONTEXT_PARAMS
 
-    def generate_prompt(self, text, to_print=True):
-        prompt = f"{self.config['COMPLETION_SETUP']}{text}\n\n{self.config['TASK']}"
+    def generate_prompt(self, text, config_name, to_print=False):
+        completion_setup = self.context_params[config_name]['COMPLETION_SETUP']
+        task = self.context_params[config_name]['TASK']
+        prompt = f"{completion_setup}{text}\n\n{task}"
         if to_print: print(prompt)
         return prompt
 
-    def generate_GPT3_sequence(self, text, key='1111'):
+    def generate_GPT3_sequence(self, text, config_name, key='1111'):
         res = Completion.create(
-            model=self.config['MODEL'],
-            prompt=self.generate_prompt(text),
-            temperature=self.config['TEMPERATURE'],
-            max_tokens=self.config['MAX_TOKENS'],
-            frequency_penalty=float(self.config['FREQUENCY_PENALTY']),
-            presence_penalty=float(self.config['PRESENCE_PENALTY']),
+            model=self.simplifier_params['MODEL'],
+            prompt=self.generate_prompt(text, config_name),
+            temperature=self.simplifier_params['TEMPERATURE'],
+            max_tokens=self.simplifier_params['MAX_TOKENS'],
+            frequency_penalty=float(self.simplifier_params['FREQUENCY_PENALTY']),
+            presence_penalty=float(self.simplifier_params['PRESENCE_PENALTY']),
             user=key)
         return res['choices'][0]['text'].lstrip()
 
@@ -35,11 +38,11 @@ class Simplifier():
             return corrected_response if corrected_response != '' and corrected_response != response else 'Sorry, I cut off the whole thing because the answer was too short...'
         return response
 
-    def generate_answer(self, text):
+    def generate_answer(self, senior_text, config_name):
         answer = ''
-        for i in range(self.config['REGEN'] + 1):
-            answer = self.generate_GPT3_sequence(text)
+        for i in range(self.simplifier_params['REGEN'] + 1):
+            answer = self.generate_GPT3_sequence(senior_text, config_name)
             if answer[-1] in ('.', '?', '!'): break
-        if self.config['CUT_OFF']: answer = self.control_broken_response(answer)
+        if self.simplifier_params['CUT_OFF']: answer = self.control_broken_response(answer)
         print(answer)
         return answer

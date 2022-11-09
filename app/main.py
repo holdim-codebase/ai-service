@@ -7,7 +7,7 @@ import base64
 from google.cloud import pubsub_v1
 from dotenv import load_dotenv
 import sys
-from config import SIMPLIFIER_PARMS
+from config import SIMPLIFIER_PARMS, CONTEXT_PARAMS_NAMES
 import os
 
 BASE_PATH = Path(__file__).resolve().parent
@@ -25,6 +25,17 @@ if os.getenv('OPENAI_API_KEY') == '':
     raise Exception('OpenAPI_Key', 'Set OPENAI_API_KEY environment variable')
 
 
+def control_config_name(config_name):
+    if config_name == '':
+        return 'default'
+    elif config_name in CONTEXT_PARAMS_NAMES:
+        return config_name
+    else:
+        print(CONTEXT_PARAMS_NAMES, config_name)
+        raise Exception("Enter a correct config name.")
+
+
+
 @app.post("/")
 async def chatbot_response(info: Request):
     req_info = await info.json()
@@ -32,9 +43,14 @@ async def chatbot_response(info: Request):
     message_bytes = base64.b64decode(data)
     message = message_bytes.decode('utf-8')
     user_message = json.loads(message)
-    juniorDescription = simplifier.generate_answer(user_message['seniorDescription'])
-    id = user_message['id']
-    json_final = json.dumps({'id': id, 'juniorDescription': juniorDescription}).encode("utf-8")
+    config_name = user_message['configName']
+    config_name = control_config_name(config_name)
+    senior_text = user_message['seniorText']
+    metadata = user_message['metadata']
+
+    junior_text = simplifier.generate_answer(senior_text, config_name)
+    json_final = json.dumps({'juniorText': junior_text, 'configName': config_name, 'metadata': metadata}).encode(
+        "utf-8")
     future = publisher.publish(topic_path, json_final)
     print(f'published message id {future.result()}')
     return json.dumps({})
