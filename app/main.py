@@ -48,7 +48,14 @@ async def chatbot_response(info: Request):
     senior_text = user_message['seniorText']
     metadata = user_message['metadata']
 
-    junior_text = simplifier.generate_answer(senior_text, config_name)
+    try:
+        junior_text = simplifier.generate_answer(senior_text, config_name)
+    except Exception as e:
+        if "maximum context length is" in str(e):
+            junior_text = "Proposal is too long"
+        else:
+            raise e
+
     json_final = json.dumps({'juniorText': junior_text, 'configName': config_name, 'metadata': metadata}).encode(
         "utf-8")
     future = publisher.publish(topic_path, json_final)
