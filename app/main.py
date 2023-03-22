@@ -47,17 +47,22 @@ async def chatbot_response(info: Request):
     config_name = control_config_name(config_name)
     senior_text = user_message['seniorText']
     metadata = user_message['metadata']
+    junior_text = ""
+    set_issue_number = False # Automatically publish proposal to app: default False
 
-    try:
-        junior_text = simplifier.generate_answer(senior_text, config_name)
-    except Exception as e:
-        if "maximum context length is" in str(e):
-            junior_text = "Proposal is too long"
-        else:
-            raise e
+    if len(senior_text) < 250:
+        junior_text = "Proposal is too SHORT"
+    else:
+        try:
+            junior_text = simplifier.generate_answer(senior_text, config_name)
+            set_issue_number = True # Automatically publish proposal to app: set to True, if processing succeed
+        except Exception as e:
+            if "maximum context length is" in str(e):
+                junior_text = "Proposal is too long"
+            else:
+                raise e
 
-    json_final = json.dumps({'juniorText': junior_text, 'configName': config_name, 'metadata': metadata}).encode(
-        "utf-8")
+    json_final = json.dumps({'juniorText': junior_text, 'configName': config_name, 'metadata': metadata, 'setIssueNumber': set_issue_number}).encode("utf-8")
     future = publisher.publish(topic_path, json_final)
     print(f'published message id {future.result()}')
     return json.dumps({})
