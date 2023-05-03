@@ -13,6 +13,11 @@ import os
 BASE_PATH = Path(__file__).resolve().parent
 sys.path.append("./config.py")
 
+NON_SUMMARIZATION_THRESHOLD = 250
+GPT3_SUMMARIZATION_THRESHOLD = 9200
+GPT3_VERSION = 3
+GPT4_VERSION = 4
+
 app = FastAPI(
     title="AI simplifier"
 )
@@ -35,7 +40,6 @@ def control_config_name(config_name):
         raise Exception("Enter a correct config name.")
 
 
-
 @app.post("/")
 async def chatbot_response(info: Request):
     req_info = await info.json()
@@ -48,21 +52,25 @@ async def chatbot_response(info: Request):
     senior_text = user_message['seniorText']
     metadata = user_message['metadata']
     junior_text = ""
-    set_issue_number = False # Automatically publish proposal to app: default False
+    set_issue_number = False  # Automatically publish proposal to app: default False
 
-    if len(senior_text) < 250:
+    if len(senior_text) < NON_SUMMARIZATION_THRESHOLD:
         junior_text = "Proposal is too SHORT"
     else:
         try:
-            junior_text = simplifier.generate_answer(senior_text, config_name)
-            set_issue_number = True # Automatically publish proposal to app: set to True, if processing succeed
+            if len(senior_text) < GPT3_SUMMARIZATION_THRESHOLD:
+                junior_text = simplifier.generate_answer(senior_text, config_name, GPT3_VERSION)
+            else:
+                junior_text = simplifier.generate_answer(senior_text, config_name, GPT4_VERSION)
+            set_issue_number = True
         except Exception as e:
             if "maximum context length is" in str(e):
                 junior_text = "Proposal is too long"
             else:
                 raise e
 
-    json_final = json.dumps({'juniorText': junior_text, 'configName': config_name, 'metadata': metadata, 'setIssueNumber': set_issue_number}).encode("utf-8")
+    json_final = json.dumps({'juniorText': junior_text, 'configName': config_name, 'metadata': metadata,
+                             'setIssueNumber': set_issue_number}).encode("utf-8")
     future = publisher.publish(topic_path, json_final)
     print(f'published message id {future.result()}')
     return json.dumps({})

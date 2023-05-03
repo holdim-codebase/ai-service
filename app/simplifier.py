@@ -6,6 +6,7 @@ from openai import Completion
 
 sys.path.append("./config.py")
 openai.api_key = SIMPLIFIER_PARMS['OPENAI_API_KEY']
+openai.organization = SIMPLIFIER_PARMS['OPENAI_API_ORG']
 
 
 class Simplifier():
@@ -31,6 +32,20 @@ class Simplifier():
             user=key)
         return res['choices'][0]['text'].lstrip()
 
+    def generate_GPT4_sequence(self, text, config_name, key='1111'):
+        res = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": 'You are a helpful crypto expert.'},
+                {"role": "user", "content": f'''{self.generate_prompt(text, config_name)}'''},
+            ],
+            temperature=self.simplifier_params['TEMPERATURE'],
+            max_tokens=self.simplifier_params['MAX_TOKENS'],
+            frequency_penalty=float(self.simplifier_params['FREQUENCY_PENALTY']),
+            presence_penalty=float(self.simplifier_params['PRESENCE_PENALTY']),
+            user=key)
+        return res['choices'][0]['message']['content'].lstrip()
+
     def control_broken_response(self, response):
         splitted_response = re.split("(?<=[.!?]) +", response)
         if splitted_response[-1][-1] not in ('.', '?', '!'):
@@ -38,10 +53,15 @@ class Simplifier():
             return corrected_response if corrected_response != '' and corrected_response != response else 'Sorry, I cut off the whole thing because the answer was too short...'
         return response
 
-    def generate_answer(self, senior_text, config_name):
+    def generate_answer(self, senior_text, config_name, gpt_version=3):
         answer = ''
         for i in range(self.simplifier_params['REGEN'] + 1):
-            answer = self.generate_GPT3_sequence(senior_text, config_name)
+            if gpt_version == 3:
+                answer = self.generate_GPT3_sequence(senior_text, config_name)
+            elif gpt_version == 4:
+                answer = self.generate_GPT4_sequence(senior_text, config_name)
+            else:
+                raise ValueError('GPT version must be 3 or 4')
             if answer[-1] in ('.', '?', '!'): break
         if self.simplifier_params['CUT_OFF']: answer = self.control_broken_response(answer)
         print(answer)
